@@ -1,11 +1,9 @@
----
-
 # Seamless Bioinformatics Pipeline for Nanopore Amplicon Sequencing
 
 **Version** Alpha
 
-> **Note:** Do not attempt to use `#3 "processor.py"` yet - still working out some bugs.  
-> `#4 align_maketree.sh` should work fine. Usage:
+> **Note:** Do not attempt to use **`#3 "processor.py"`** yet - still working out some bugs.  
+> **`#4 align_maketree.sh`** should work fine. Usage:
 > ```bash
 > bash align_maketree.sh samples.fasta
 > ```
@@ -44,5 +42,3 @@
    - This script should be run once you have a FASTA of consensus sequences. It filters out any consensus sequences with <20 supporting reads and saves them to a FASTA called `discard.fasta`. It then blasts the passed sequences via the BLAST API and downloads the top hit for each sequence. Once this has been done for every sequence, it removes duplicate BLAST hits and aligns both the samples and BLAST hits with MAFFT, accounting for reverse complements. This alignment can then be uploaded to MAFFT's online GUI to visualize the tree.
    - *Input*:
      - `samples.fasta` - A FASTA file with the samples you want to make a tree of together.
-
---- 
