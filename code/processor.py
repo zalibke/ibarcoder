@@ -1,3 +1,7 @@
+# Main script for consensus generation
+# Zane Libke
+# Last edit - September 5, 2024
+
 import os
 import glob
 import subprocess
@@ -6,8 +10,10 @@ from Bio import SeqIO
 import retrieve_inat
 import sys
 
-#samples = sys.argv[1]
-#primers_db = sys.argv[2]
+samples = sys.argv[1]
+primers_db = sys.argv[2]
+samples = pd.read_csv("../data/samples.csv")
+primers_db = pd.read_csv("../data/primers_db.txt")
 #inat = FALSE
 
 ## functions ##
@@ -23,9 +29,6 @@ def read_fasta(fasta_file):
         headers.append(record.id)
         sequences.append(str(record.seq))
     return headers, sequences
-
-samples = pd.read_csv("../data/samples.csv")
-primers_db = pd.read_csv("../data/primers_db.txt")
 
 #retrieve missing inat data from samples with an inat_link field
 #if sys.argv[3] = TRUE - make this an optional parameter
@@ -57,7 +60,7 @@ for idx, row in samples.iterrows():
     cat_files = "cat ../data/" + barcode_folder + "/*.fastq > ../data/" + barcode_folder + "/input/temp.fastq"
     subprocess.run(cat_files, shell=True)
     
-    command = "NGSpeciesID --ont --consensus --medaka --primer_file ../data/primers_temp.txt --fastq ../data/" + barcode_folder + "/input/temp.fastq --outfolder ../data/" + barcode_folder + " --m 750 --s 150 --sample_size 1000"
+    command = "NGSpeciesID --ont --consensus --medaka --primer_file ../data/primers_temp.txt --fastq ../data/" + barcode_folder + "/input/temp.fastq --outfolder ../data/" + barcode_folder + " --m 750 --s 250 --sample_size 1000"
     print(command)
     
     try:
@@ -116,5 +119,33 @@ for idx, row in samples.iterrows():
             samples.at[idx, f'consensus_sequence_{i+1}'] = sequence
             
 samples.to_csv("../results/samples_results.csv")
+
+# Function to create a FASTA format header
+def create_fasta_header(sample_code, genus_prior, species_prior, primerF, primerR, consensus_header):
+    return f">{sample_code}_{genus_prior}_{species_prior}_{primerF}_{primerR}_{consensus_header}"
+
+# Create a FASTA file for consensus sequences
+with open("../results/consensus_sequences.fasta", "w") as fasta_file:
+    for idx, row in samples.iterrows():
+        sample_code = row['sample_code']
+        genus_prior = row['genus_prior']
+        species_prior = row['species_prior']
+        primerF = row['primerF']
+        primerR = row['primerR']
+        
+        # Write all available consensus headers and sequences
+        for i in range(max_sequences):
+            consensus_header = row.get(f'consensus_header_{i+1}')
+            consensus_sequence = row.get(f'consensus_sequence_{i+1}')
+            
+            # Ensure both header and sequence are present
+            if pd.notna(consensus_header) and pd.notna(consensus_sequence):
+                # Create and write the header
+                fasta_header = create_fasta_header(sample_code, genus_prior, species_prior, primerF, primerR, consensus_header)
+                fasta_file.write(f"{fasta_header}\n")
+                # Write the corresponding sequence
+                fasta_file.write(f"{consensus_sequence}\n")
+
+print("FASTA file with consensus sequences created at '../results/consensus_sequences.fasta'")
 
     

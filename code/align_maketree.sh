@@ -1,6 +1,7 @@
 #!/bin/bash
 # Zane Libke
-# August 17 2024
+# CREATED : August 17, 2024
+# LAST EDIT: September 5, 2024
 # script to take sample and blasthit fasta and create a tree from them
 
 #conda install mafft
@@ -9,6 +10,8 @@
 
 # Get the input FASTA file and BLAST XML file from command-line arguments
 sample_fasta="$1"
+#min_src="$2" # allow user to decide min supporting reads to discard consensuses
+#retrieve_inat="$3" # retrieve metadata from inat flag
 
 #Names of various necessary files
 base_name=$(basename "$sample_fasta" .fasta)
@@ -26,11 +29,11 @@ echo "$hits_fasta"
 #filter sequences for >=20 reads
 python3 filter_20.py "$sample_fasta"
 
-#blast filtered sequences store hits
-if [ -e "$hits_fasta" ]; then
-    echo "Blast hits file '$hits_fasta' exists, skipping blast query..."
+# Blast filtered sequences, store hits
+if [ -e "$hits_fasta" ] && [ -s "$hits_fasta" ]; then
+    echo "Blast hits file '$hits_fasta' exists and is not empty, skipping blast query..."
 else
-    echo "Blast hits file '$hits_fasta' DOES NOT EXIST, querying blast..."
+    echo "Blast hits file '$hits_fasta' either does not exist or is empty, querying blast..."
     python3 query_blast.py "$filtered_fasta"
 fi
 

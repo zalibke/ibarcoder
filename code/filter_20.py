@@ -1,3 +1,9 @@
+# Simple python script to filter consensus sequences for >20 supporting reads
+# IMPORTANT: Currently takes the value from supporting_reads = int(header.split("_")[-2]) (AKA second to last character when split by "_")
+# Not the most robust method, but works as long as the header is constant. Test rigorously in the future, maybe come up with more rigorous solution?
+# Zane Libke
+# Last edit - September 5, 2024
+
 import sys
 from Bio import SeqIO
 import os
@@ -26,9 +32,10 @@ def main():
             sequence = str(record.seq)
 
             # Split the header and extract the number of supporting reads
-            # Assuming the format is: >Outer01_Inner01_medaka_cl_id_0_reads_976_RWCA000894_Phrynobatrachus sp
-            # The number of reads is in the 7th position after splitting by "_"
-            supporting_reads = int(header.split("_")[7])
+            # Assuming the format is: >ZL052_Boana_nigra_16-SarF_16S-BrR-O_consensus_cl_id_14_total_supporting_reads_201_segment0
+            # The number of reads is in the 2nd to last position after splitting by "_"
+            # I'm assuming the segment stuff will be consistent if there are multiple?
+            supporting_reads = int(header.split("_")[-2])
 
             # Check the number of supporting reads
             if supporting_reads < 20:
