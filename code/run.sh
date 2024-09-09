@@ -3,16 +3,20 @@
 #bash script to run simple ibarcoder pipeline on example dataset
 #Zane Libke - 5 September 2024
 
-# Step 1 : input samples.txt and primers_db.txt
+#temp fix to pandas docker issue....
+pip3 install pandas
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <samples.txt> <primers_db.txt>"
-    exit 1
-fi
+# Step 1 : input samples.txt and primers_db.txt
+#if [ "$#" -ne 2 ]; then
+#    echo "Usage: $0 <samples.txt> <primers_db.txt>"
+#    exit 1
+#fi
 
 # Step 1: Input samples.txt and primers_db.txt
-samples=$1
-primers_db=$2
+#samples=$1
+samples="../data/samples.csv"
+#primers_db=$2
+primers_db="../data/primers_db.csv"
 
 # Step 2: run processor.py to create consensus sequences for all samples
 python3 processor.py "$samples" "$primers_db"
